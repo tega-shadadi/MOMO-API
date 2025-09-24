@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dash WiFi Billing</title>
+</head>
+<body>
+  <h2>Welcome to Dash WiFi</h2>
+  <p>Pay UGX 1,000 to access the internet for 1 hour.</p>
+
+  <input type="text" id="phone" placeholder="Enter MTN Number (e.g. 078xxxxxxx)" />
+  <button onclick="payWithMTN()">Pay with MTN MoMo</button>
+
+  <p id="status"></p>
+
+  <script>
+    async function payWithMTN() {
+      const phone = document.getElementById('phone').value;
+      document.getElementById('status').innerText = "Processing payment...";
+
+      const res = await fetch("/api/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone, amount: 1000 })
+      });
+
+      const data = await res.json();
+      document.getElementById('status').innerText = data.message;
+    }
+  </script>
+</body>
+</html>
