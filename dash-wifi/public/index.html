@@ -6,7 +6,11 @@
 </head>
 <body>
   <h2>Welcome to Dash WiFi</h2>
-  <p>Pay UGX 1,000 to access the internet for 1 hour.</p>
+  <p>Select your plan:</p>
+
+  <label><input type="radio" name="plan" value="1000" checked> UGX 1,000 - 24 hours</label><br>
+  <label><input type="radio" name="plan" value="6000"> UGX 6,000 - 1 week</label><br>
+  <label><input type="radio" name="plan" value="20000"> UGX 20,000 - 1 month</label><br><br>
 
   <input type="text" id="phone" placeholder="Enter MTN Number (e.g. 078xxxxxxx)" />
   <button onclick="payWithMTN()">Pay with MTN MoMo</button>
@@ -16,16 +20,29 @@
   <script>
     async function payWithMTN() {
       const phone = document.getElementById('phone').value;
-      document.getElementById('status').innerText = "Processing payment...";
+      const plan = document.querySelector('input[name="plan"]:checked').value;
+      const status = document.getElementById('status');
+      status.innerText = "Processing payment...";
 
-      const res = await fetch("/api/pay", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: phone, amount: 1000 })
-      });
+      console.log("DEBUG: Sending payment request", { phone, plan });
 
-      const data = await res.json();
-      document.getElementById('status').innerText = data.message;
+      try {
+        const res = await fetch("/api/pay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, amount: parseInt(plan) })
+        });
+
+        console.log("DEBUG: Raw response status", res.status);
+
+        const data = await res.json();
+        console.log("DEBUG: Response JSON", data);
+
+        status.innerText = data.message;
+      } catch (err) {
+        console.error("DEBUG: Fetch error", err);
+        status.innerText = "❌ Error sending request: " + err.message;
+      }
     }
   </script>
 </body>
